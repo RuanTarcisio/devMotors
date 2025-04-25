@@ -1,32 +1,35 @@
-import { Hero } from "@/components/hero";
-import styles from "./styles.module.scss";
-import { getItemBySlug } from "@/utils/actions/get-data";
-import { PostProps } from "@/utils/post.type ";
-import { Phone } from "lucide-react";
-import { Container } from "@/components/container";
-import Image from "next/image";
-import { Metadata } from "next";
+import styles from './styles.module.scss'
+import { Hero } from '@/components/hero';
+import { getItemBySlug } from '@/utils/actions/get-data'
+import { PostProps } from '@/utils/post.type'
+import { Phone } from 'lucide-react';
+import { Container } from '@/components/container';
+import Image from 'next/image';
+import { Metadata } from 'next'
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const { slug } = params;
+export async function generateMetadata({ params: { slug } }: {
+  params: { slug: string }
+}): Promise<Metadata>{
 
-  try {
+  try{
     const { objects }: PostProps = await getItemBySlug(slug)
-    .catch(()=>{
+    .catch(() => {
       return {
         title: "DevMotors - Sua oficina especializada!",
         description: "Oficina de carros em São Paulo",
-      };
+      }
     })
 
-    return {
+
+    return{
       title: `DevMotors - ${objects[0].title}`,
       description: `${objects[0].metadata.description.text}`,
+      keywords: ["devmotors", "troca de oleo", "devmotors troca de oleo"],
       openGraph: {
         title: `DevMotors - ${objects[0].title}`,
         images: [objects[0].metadata.banner.url]
       },
-      robots: {
+      robots:{
         index: true,
         follow: true,
         nocache: true,
@@ -37,24 +40,26 @@ export async function generateMetadata({ params }: { params: { slug: string } })
         }
       }
     }
-  } catch (err) {
+
+
+  }catch(err){
     return {
       title: "DevMotors - Sua oficina especializada!",
       description: "Oficina de carros em São Paulo",
-    };
+    }
   }
+
+
 }
 
-export default async function Page({ params }: { params: { slug: string } }) {
-  const { slug } = params;
+
+export default async function Page({ params: { slug } }: {
+  params: { slug: string }
+}){
   const { objects }: PostProps = await getItemBySlug(slug);
-  // console.log(JSON.stringify(objects, null, 2));
+  //console.log(JSON.stringify(objects, null, 2));
 
-  if (!objects || objects.length === 0) {
-    return <div>Conteúdo não encontrado.</div>;
-  }
-
-  return (
+  return(
     <>
       <Hero
         heading={objects[0].title}
@@ -66,15 +71,19 @@ export default async function Page({ params }: { params: { slug: string } }) {
 
       <Container>
         <section className={styles.about}>
+
           <article className={styles.innerAbout}>
             <h1 className={styles.title}>
               {objects[0].metadata.description.title}
             </h1>
-            <p>{objects[0].metadata.description.text}</p>
+            <p>
+              {objects[0].metadata.description.text}
+            </p>
+
             {objects[0].metadata.description.button_active && (
               <a
                 href={objects[0].metadata.description.button_url as string}
-                target="_blank"
+                target='_blank'
                 className={styles.link}
               >
                 {objects[0].metadata.description.button_title}
@@ -89,12 +98,13 @@ export default async function Page({ params }: { params: { slug: string } }) {
               quality={100}
               fill={true}
               priority={true}
-              sizes="(max-width: 480px) 100vw, (max-width: 1024px) 75vw, 60vw"
               src={objects[0].metadata.description.banner.url}
+              sizes="(max-width: 480px) 100vw, (max-width: 1024px) 75vw, 60vw"
             />
           </div>
+
         </section>
       </Container>
     </>
-  );
+  )
 }
