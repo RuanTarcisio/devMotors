@@ -1,13 +1,12 @@
 import styles from './styles.module.scss';
 import { Hero } from '@/components/hero';
 import { getItemBySlug } from '@/utils/actions/get-data'; 
-import { PostProps } from '@/utils/post.type';
 import { Phone } from 'lucide-react';
 import { Container } from '@/components/container';
 import Image from 'next/image';
 import { Metadata } from 'next';
 
-interface PageParams {
+interface PostParams {
   slug: string;
 }
 
@@ -16,12 +15,9 @@ const defaultMetadata: Metadata = {
   description: "Oficina de carros em São Paulo",
 };
 
-export async function generateMetadata({ params }: { params: PageParams }): Promise<Metadata> {
-  // Agora precisamos await params
-  const { slug } = await params;
-  
+export async function generateMetadata({ params }: { params: PostParams }): Promise<Metadata> {
   try {
-    const data = await getItemBySlug(slug);
+    const data = await getItemBySlug(params.slug);
     
     if (!data?.objects?.length) {
       return defaultMetadata;
@@ -37,16 +33,6 @@ export async function generateMetadata({ params }: { params: PageParams }): Prom
         title: `DevMotors - ${post.title}`,
         images: post.metadata.banner.url ? [post.metadata.banner.url] : [],
       },
-      robots: {
-        index: true,
-        follow: true,
-        nocache: true,
-        googleBot: {
-          index: true,
-          follow: true,
-          noimageindex: true,
-        }
-      }
     };
   } catch (error) {
     console.error('Error generating metadata:', error);
@@ -54,13 +40,11 @@ export async function generateMetadata({ params }: { params: PageParams }): Prom
   }
 }
 
-export default async function Page({ params }: { params: PageParams }) {
-  // Agora precisamos await params
-  const { slug } = await params;
-  let data: PostProps;
+export default async function PostPage({ params }: { params: PostParams }) {
+  let data;
   
   try {
-    data = await getItemBySlug(slug);
+    data = await getItemBySlug(params.slug);
   } catch (error) {
     console.error('Error fetching post:', error);
     return <div className={styles.error}>Erro ao carregar o post</div>;

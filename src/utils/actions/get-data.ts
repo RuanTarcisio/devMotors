@@ -7,12 +7,11 @@ export async function getDataHome() {
       { next: { revalidate: 120 } }
     );
 
-    if (!res.ok) {
-      throw new Error("Failed to fetch data");
-    }
+    
 
     return res.json();
   } catch (err) {
+    console.log(err)
     throw new Error("Failed to fetch data");
   }
 }
