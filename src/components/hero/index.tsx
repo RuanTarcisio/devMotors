@@ -34,6 +34,8 @@ export function Hero({ heading, bannerUrl, buttonTitle, buttonUrl, icon }: HeroP
           priority={true}
           quality={100}
           fill={true}
+          sizes="(max-width: 480px) 100vw, (max-width: 1024px) 75vw, 60vw"
+
         />
       </div>
     </main>
