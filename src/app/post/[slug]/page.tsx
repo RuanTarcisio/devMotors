@@ -15,7 +15,8 @@ const defaultMetadata: Metadata = {
   description: "Oficina de carros em São Paulo",
 };
 
-export async function generateMetadata({ params }: { params: PostParams }): Promise<Metadata> {
+export async function generateMetadata(props: { params: Promise<PostParams> }): Promise<Metadata> {
+  const params = await props.params;
   try {
     const data = await getItemBySlug(params.slug);
     
@@ -40,9 +41,10 @@ export async function generateMetadata({ params }: { params: PostParams }): Prom
   }
 }
 
-export default async function PostPage({ params }: { params: PostParams }) {
+export default async function PostPage(props: { params: Promise<PostParams> }) {
+  const params = await props.params;
   let data;
-  
+
   try {
     data = await getItemBySlug(params.slug);
   } catch (error) {
