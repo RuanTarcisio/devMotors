@@ -8,7 +8,7 @@ import Image from "next/image";
 import { Metadata } from "next";
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const { slug } = await params;
+  const { slug } = params;
 
   try {
     const { objects }: PostProps = await getItemBySlug(slug)
@@ -46,7 +46,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 }
 
 export default async function Page({ params }: { params: { slug: string } }) {
-  const { slug } = await params;
+  const { slug } = params;
   const { objects }: PostProps = await getItemBySlug(slug);
   // console.log(JSON.stringify(objects, null, 2));
 
