@@ -9,12 +9,12 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "DevMotors - Sua oficina especializada!",
   description: "Oficina de carros em São Paulo",
-  keywords: ["oficina", "oficina de carros", "carros", "manutenção de carros",],
+  keywords: ["oficina", "oficina carros", "carros", "manutenção de carros"],
   openGraph: {
     title: "DevMotors - Sua oficina especializada!",
     images: [`${process.env.NEXT_PUBLIC_URL}/logo.jpg`]
   },
-  robots: {
+  robots:{
     index: true,
     follow: true,
     nocache: true,
@@ -36,9 +36,9 @@ export default function RootLayout({
       <body className={inter.className}>
         <Header/>
         {children}
-        <p style={{textAlign: "center", marginTop: 128, marginBottom: 24}}>
-        Todos direitos reservados Dev Motors @{`${new Date().getFullYear()}`}
-      </p>
+        <p style={{ textAlign: "center", marginTop: 54, marginBottom: 24 }}>
+          Todos direitos reservados @{`${new Date().getFullYear()}`}
+        </p>
       </body>
     </html>
   );

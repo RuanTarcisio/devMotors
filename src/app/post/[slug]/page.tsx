@@ -1,35 +1,43 @@
-import styles from './styles.module.scss'
+import styles from './styles.module.scss';
 import { Hero } from '@/components/hero';
-import { getItemBySlug } from '@/utils/actions/get-data'
-import { PostProps } from '@/utils/post.type'
+import { getItemBySlug } from '@/utils/actions/get-data'; 
+import { PostProps } from '@/utils/post.type';
 import { Phone } from 'lucide-react';
 import { Container } from '@/components/container';
 import Image from 'next/image';
-import { Metadata } from 'next'
+import { Metadata } from 'next';
 
-export async function generateMetadata({ params: { slug } }: {
-  params: { slug: string }
-}): Promise<Metadata>{
+interface PageParams {
+  slug: string;
+}
 
-  try{
-    const { objects }: PostProps = await getItemBySlug(slug)
-    .catch(() => {
-      return {
-        title: "DevMotors - Sua oficina especializada!",
-        description: "Oficina de carros em São Paulo",
-      }
-    })
+const defaultMetadata: Metadata = {
+  title: "DevMotors - Sua oficina especializada!",
+  description: "Oficina de carros em São Paulo",
+};
 
+export async function generateMetadata({ params }: { params: PageParams }): Promise<Metadata> {
+  // Agora precisamos await params
+  const { slug } = await params;
+  
+  try {
+    const data = await getItemBySlug(slug);
+    
+    if (!data?.objects?.length) {
+      return defaultMetadata;
+    }
 
-    return{
-      title: `DevMotors - ${objects[0].title}`,
-      description: `${objects[0].metadata.description.text}`,
+    const post = data.objects[0];
+    
+    return {
+      title: `DevMotors - ${post.title}`,
+      description: post.metadata.description.text,
       keywords: ["devmotors", "troca de oleo", "devmotors troca de oleo"],
       openGraph: {
-        title: `DevMotors - ${objects[0].title}`,
-        images: [objects[0].metadata.banner.url]
+        title: `DevMotors - ${post.title}`,
+        images: post.metadata.banner.url ? [post.metadata.banner.url] : [],
       },
-      robots:{
+      robots: {
         index: true,
         follow: true,
         nocache: true,
@@ -39,54 +47,59 @@ export async function generateMetadata({ params: { slug } }: {
           noimageindex: true,
         }
       }
-    }
-
-
-  }catch(err){
-    return {
-      title: "DevMotors - Sua oficina especializada!",
-      description: "Oficina de carros em São Paulo",
-    }
+    };
+  } catch (error) {
+    console.error('Error generating metadata:', error);
+    return defaultMetadata;
   }
-
-
 }
 
+export default async function Page({ params }: { params: PageParams }) {
+  // Agora precisamos await params
+  const { slug } = await params;
+  let data: PostProps;
+  
+  try {
+    data = await getItemBySlug(slug);
+  } catch (error) {
+    console.error('Error fetching post:', error);
+    return <div className={styles.error}>Erro ao carregar o post</div>;
+  }
 
-export default async function Page({ params: { slug } }: {
-  params: { slug: string }
-}){
-  const { objects }: PostProps = await getItemBySlug(slug);
-  //console.log(JSON.stringify(objects, null, 2));
+  if (!data?.objects?.length) {
+    return <div className={styles.notFound}>Post não encontrado</div>;
+  }
 
-  return(
+  const post = data.objects[0];
+
+  return (
     <>
       <Hero
-        heading={objects[0].title}
-        buttonTitle={objects[0].metadata.button.title}
-        buttonUrl={objects[0].metadata.button.url}
-        bannerUrl={objects[0].metadata.banner.url}
+        heading={post.title}
+        buttonTitle={post.metadata.button.title}
+        buttonUrl={post.metadata.button.url}
+        bannerUrl={post.metadata.banner.url}
         icon={<Phone size={24} color="#FFF" />}
       />
 
       <Container>
         <section className={styles.about}>
-
           <article className={styles.innerAbout}>
             <h1 className={styles.title}>
-              {objects[0].metadata.description.title}
+              {post.metadata.description.title}
             </h1>
             <p>
-              {objects[0].metadata.description.text}
+              {post.metadata.description.text}
             </p>
 
-            {objects[0].metadata.description.button_active && (
+            {post.metadata.description.button_active && (
               <a
-                href={objects[0].metadata.description.button_url as string}
+                href={post.metadata.description.button_url as string}
                 target='_blank'
+                rel="noopener noreferrer"
                 className={styles.link}
               >
-                {objects[0].metadata.description.button_title}
+                {post.metadata.description.button_title}
               </a>
             )}
           </article>
@@ -94,17 +107,16 @@ export default async function Page({ params: { slug } }: {
           <div className={styles.bannerAbout}>
             <Image
               className={styles.imageAbout}
-              alt={objects[0].title}
+              alt={post.title}
               quality={100}
-              fill={true}
-              priority={true}
-              src={objects[0].metadata.description.banner.url}
+              fill
+              priority
+              src={post.metadata.description.banner.url}
               sizes="(max-width: 480px) 100vw, (max-width: 1024px) 75vw, 60vw"
             />
           </div>
-
         </section>
       </Container>
     </>
-  )
+  );
 }
